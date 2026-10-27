@@ -1,0 +1,202 @@
+# src/streaming.py
+
+import os
+import threading
+import time
+
+from config.settings import (
+    FFMPEG_CAPTURE_OPTIONS,
+    RECONNECT_DELAY_SECONDS,
+    MAX_READ_FAILURES,
+    READ_RETRY_WAIT_SECONDS,
+)
+
+# Variabel harus ditetapkan sebelum VideoCapture dibuka.
+os.environ.setdefault(
+    "OPENCV_FFMPEG_CAPTURE_OPTIONS",
+    FFMPEG_CAPTURE_OPTIONS,
+)
+
+import cv2
+
+
+class VideoStream:
+    def __init__(
+        self,
+        source,
+        reconnect_delay=RECONNECT_DELAY_SECONDS,
+        max_read_failures=MAX_READ_FAILURES,
+    ):
+        self.source = source
+        self.reconnect_delay = reconnect_delay
+        self.max_read_failures = max_read_failures
+
+        self._lock = threading.Lock()
+        self._stop_event = threading.Event()
+
+        self._frame = None
+        self._last_frame_time = None
+        self._status = "Menghubungkan ke CCTV..."
+
+        self.frames_received = 0
+        self.last_frame_received = None
+        self.frame_interval_ms = 0.0
+
+        # Thread khusus untuk membaca stream.
+        self._thread = threading.Thread(
+            target=self._update,
+            daemon=True,
+            name="VideoStreamReader",
+        )
+        self._thread.start()
+
+    def _set_status(self, message):
+        with self._lock:
+            self._status = message
+
+    def get_status(self):
+        with self._lock:
+            return self._status
+
+    def _open_capture(self):
+        """Membuka stream melalui backend FFmpeg."""
+
+        cap = cv2.VideoCapture(
+            self.source,
+            cv2.CAP_FFMPEG,
+        )
+
+        if not cap.isOpened():
+            cap.release()
+            return None
+
+        # Tidak semua backend mendukung pengaturan ini.
+        # Jika tidak didukung, pembacaan tetap dapat berjalan.
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+        return cap
+
+    def _update(self):
+        while not self._stop_event.is_set():
+
+            self._set_status("Menghubungkan ke CCTV...")
+
+            cap = self._open_capture()
+
+            if cap is None:
+                self._set_status(
+                    "Stream gagal dibuka. Mencoba kembali..."
+                )
+
+                self._stop_event.wait(self.reconnect_delay)
+                continue
+
+            failures = 0
+
+            try:
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+                print(
+                    f"[STREAM] Terhubung: "
+                    f"{width}x{height}"
+                )
+
+                while not self._stop_event.is_set():
+
+                    # Pembacaan stream dilakukan di thread ini,
+                    # sehingga UI tidak perlu menunggu read().
+                    ret, frame = cap.read()
+
+                    if not ret or frame is None:
+                        failures += 1
+
+                        if failures >= self.max_read_failures:
+                            self._set_status(
+                                "Pembacaan gagal. "
+                                "Menyambungkan ulang..."
+                            )
+                            break
+
+                        self._stop_event.wait(
+                            READ_RETRY_WAIT_SECONDS
+                        )
+                        continue
+
+                    now = time.monotonic()
+
+                    with self._lock:
+                        if self.last_frame_received is not None:
+                            self.frame_interval_ms = (
+                                now - self.last_frame_received
+                            ) * 1000
+
+                        self.last_frame_received = now
+                        self.frames_received += 1
+                        self._frame = frame
+                        self._status = f"Live | {frame.shape[1]}x{frame.shape[0]}"
+
+                    failures = 0
+
+                    # Menimpa frame sebelumnya dengan frame terbaru.
+                    # Tidak membuat antrean frame untuk ditampilkan.
+
+            except Exception as exc:
+                self._set_status(
+                    f"Kesalahan streaming: {exc}"
+                )
+                print(f"[STREAM ERROR] {exc}")
+
+            finally:
+                cap.release()
+
+            if not self._stop_event.is_set():
+                self._set_status(
+                    "Stream terputus. Menyambungkan ulang..."
+                )
+                self._stop_event.wait(self.reconnect_delay)
+
+    def read_frame(self):
+        """
+        Mengembalikan frame terbaru yang tersedia.
+
+        Return:
+            (True, frame) jika frame tersedia.
+            (False, None) jika belum menerima frame.
+        """
+        with self._lock:
+            if self._frame is None:
+                return False, None
+
+            # Salinan agar pemanggil dapat menggambar bounding box
+            # tanpa mengubah frame yang disimpan oleh reader.
+            return True, self._frame.copy()
+    
+    def get_metrics(self):
+        with self._lock:
+            age_ms = (
+                (time.monotonic() - self.last_frame_received) * 1000
+                if self.last_frame_received is not None
+                else None
+            )
+
+            return {
+                "frames_received": self.frames_received,
+                "frame_interval_ms": self.frame_interval_ms,
+                "frame_age_ms": age_ms,
+                "status": self._status,
+            }
+
+    def release(self):
+        """Menghentikan thread dan menunggu pembacaan berhenti."""
+        self._stop_event.set()
+
+        self._thread.join(timeout=6.0)
+
+        if self._thread.is_alive():
+            print(
+                "[STREAM] Reader belum berhenti. "
+                "Koneksi mungkin masih menunggu respons jaringan."
+            )
+        else:
+            print("[STREAM] Reader dihentikan.")
