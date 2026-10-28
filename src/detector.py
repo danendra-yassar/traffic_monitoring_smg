@@ -3,45 +3,60 @@ from ultralytics import YOLO
 
 
 class VehicleDetector:
+    # COCO class IDs
+    VEHICLE_CLASSES = [2, 3, 5, 7]  # car, motorcycle, bus, truck
+
     def __init__(
         self,
         model_path="models/yolov8n.pt",
-        confidence=0.30,
+        confidence=0.25,
         image_size=640,
     ):
         self.model = YOLO(model_path)
         self.confidence = confidence
         self.image_size = image_size
 
-        # COCO class IDs
-        self.vehicle_classes = [0, 2, 3, 5, 7]
-
     def detect(self, frame):
-        results = self.model.predict(
+        results = self.model.track(
             source=frame,
+            persist=True,
+            tracker="bytetrack.yaml",
+            classes=self.VEHICLE_CLASSES,
             conf=self.confidence,
             imgsz=self.image_size,
-            classes=self.vehicle_classes,
             verbose=False,
         )
 
         result = results[0]
         annotated_frame = result.plot()
+        vehicles = []
 
-        counts = {
-            "car": 0,
-            "motorcycle": 0,
-            "bus": 0,
-            "truck": 0,
-            "person": 0,
+        boxes = result.boxes
 
-        }
+        if boxes is None or boxes.id is None:
+            return annotated_frame, vehicles
 
-        if result.boxes is not None:
-            for class_id in result.boxes.cls.int().tolist():
-                class_name = self.model.names[class_id]
+        coordinates = boxes.xyxy.cpu().tolist()
+        class_ids = boxes.cls.int().cpu().tolist()
+        track_ids = boxes.id.int().cpu().tolist()
+        confidences = boxes.conf.cpu().tolist()
 
-                if class_name in counts:
-                    counts[class_name] += 1
+        for bbox, class_id, track_id, confidence in zip(
+            coordinates, class_ids, track_ids, confidences
+        ):
+            x1, y1, x2, y2 = bbox
 
-        return annotated_frame, counts
+            # Titik tengah bawah bounding box.
+            # Lebih sesuai untuk memperkirakan posisi kendaraan di jalan.
+            anchor_x = (x1 + x2) / 2
+            anchor_y = y2
+
+            vehicles.append({
+                "track_id": int(track_id),
+                "class_name": self.model.names[class_id],
+                "confidence": float(confidence),
+                "bbox": [x1, y1, x2, y2],
+                "anchor": (anchor_x, anchor_y),
+            })
+
+        return annotated_frame, vehicles
