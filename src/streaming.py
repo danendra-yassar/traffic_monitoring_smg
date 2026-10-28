@@ -1,6 +1,3 @@
-
-# src/streaming.py
-
 import subprocess
 import threading
 import time
@@ -11,7 +8,6 @@ from config.settings import (
     RECONNECT_DELAY_SECONDS,
     MAX_READ_FAILURES,
 )
-
 
 class VideoStream:
     def __init__(

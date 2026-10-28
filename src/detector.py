@@ -6,7 +6,7 @@ class VehicleDetector:
     def __init__(
         self,
         model_path="models/yolov8n.pt",
-        confidence=0.35,
+        confidence=0.30,
         image_size=640,
     ):
         self.model = YOLO(model_path)
@@ -14,7 +14,7 @@ class VehicleDetector:
         self.image_size = image_size
 
         # COCO class IDs
-        self.vehicle_classes = [0, 2, 3, 5,7]
+        self.vehicle_classes = [0, 2, 3, 5, 7]
 
     def detect(self, frame):
         results = self.model.predict(

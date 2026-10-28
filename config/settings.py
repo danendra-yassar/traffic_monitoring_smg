@@ -2,9 +2,11 @@
 
 # URL HLS CCTV Dishub Kota Semarang
 STREAM_URL = (
-    "https://livepantau.semarangkota.go.id/"
-    "0f310a61-9d28-4f03-845d-daa815b72ccf/index.m3u8"
+    "https://livepantau.semarangkota.go.id/e1922578-42df-4a92-965a-9b6779d2c362/index.m3u8"
 )
+STREAM_URL_2 = (
+    "https://livepantau.semarangkota.go.id/74ffdc80-264f-4028-94cc-4ede386b0340/index.m3u8"
+) # depan polda
 
 # Opsi FFmpeg untuk mengurangi buffering yang tidak diperlukan.
 # Pengaruhnya bergantung pada versi FFmpeg dan backend OpenCV.
