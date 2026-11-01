@@ -18,10 +18,10 @@ class TrafficAnalytics:
         # Sesuaikan dengan lajur antrean pada CCTV yang digunakan.
         if roi_points is None:
             roi_points = [
-                (420, 180),
-                (720, 180),
-                (1270, 710),
-                (650, 710),
+                (120, 280),
+                (240, 280),
+                (920, 680),
+                (270, 720),
             ]
 
         self.roi = np.array(roi_points, dtype=np.int32)
@@ -125,7 +125,7 @@ class TrafficAnalytics:
         if high_queue:
             status = "INDIKASI ANTREAN TINGGI"
         elif queue_count > 0:
-            status = "KENDARAAN DI ZONA ANTREAN"
+            status = "BERJALAN - KENDARAAN DI ZONA ANTREAN"
         else:
             status = "ZONA KOSONG"
 
@@ -144,7 +144,7 @@ class TrafficAnalytics:
             (20, 80),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.7,
-            (0, 255, 255),
+            (80, 30, 30),
             2,
         )
 
@@ -154,7 +154,7 @@ class TrafficAnalytics:
             (20, 110),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.7,
-            (0, 255, 255),
+            (80, 30, 30),
             2,
         )
 

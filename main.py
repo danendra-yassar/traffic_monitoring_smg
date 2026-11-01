@@ -2,14 +2,33 @@
 import time
 import cv2
 
-from config.settings import STREAM_URL
+# from config.settings import STREAM_URL
+
+from config.settings import TARGET_CCTV_NAME
+
+from src.cctv_resolver import (
+    get_cctv_url,
+    CCTVResolverError,
+)
 from src.streaming import VideoStream
 from src.detector import VehicleDetector
 from src.analytics import TrafficAnalytics
 
 
 def main():
-    stream = VideoStream(STREAM_URL)
+    try:
+        stream_url = get_cctv_url(TARGET_CCTV_NAME)
+
+        print(f"[CCTV] URL stream berhasil ditemukan:")
+        print(stream_url)
+
+    except CCTVResolverError as error:
+        print(f"[CCTV] Gagal mendapatkan URL: {error}")
+        return
+
+    # 2. Gunakan URL hasil resolver untuk FFmpeg.
+    stream = VideoStream(stream_url)
+    
     detector = VehicleDetector(
         model_path="models/yolov8n.pt",
         confidence=0.25,
