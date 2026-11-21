@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pantau Lalu Lintas Kota Semarang — YOLOv8 Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="topbar-title">
+            <h1>Traffic Monitoring — Kota Semarang</h1>
+            <p>Deteksi Antrean Persimpangan Lampu Merah (YOLOv8 + ROI Dinamis)</p>
+        </div>
+
+        <div class="summary-pills">
+            <div class="pill">
+                <span class="pill-label">Kamera Aktif</span>
+                <strong id="kpi-active-cams">0 / 4</strong>
+            </div>
+            <div class="pill" id="kpi-alert-pill">
+                <span class="pill-label">Antrean Tinggi</span>
+                <strong id="kpi-high-queue">0 Titik</strong>
+            </div>
+            <div class="pill">
+                <span class="pill-label">Kendaraan di ROI</span>
+                <strong id="kpi-total-vehicles">0</strong>
+            </div>
+        </div>
+    </header>
+
+    <section class="control-bar">
+        <div class="selector-group">
+            <label for="cctv-search-input">Pilih CCTV PANTAUSEMAR:</label>
+            <div class="selector-inputs">
+                <input type="text" id="cctv-search-input" list="cctv-options"
+                    placeholder="Ketik nama lokasi (misal: Tugumuda 2, BALAIKOTA)..." autocomplete="off" />
+                <datalist id="cctv-options"></datalist>
+                <button type="button" id="btn-refresh-cctvs" class="btn btn-secondary" title="Muat ulang daftar CCTV">
+                    Muat Ulang Daftar
+                </button>
+                <button type="button" id="btn-add-cctv" class="btn btn-primary">
+                    + Tambah CCTV
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div id="alert-banner" class="alert-banner hidden" role="alert"></div>
+
+    <main class="container">
+        <div id="empty-state" class="empty-state">
+            <h2>Belum Ada CCTV yang Dipantau</h2>
+            <p>Pilih lokasi persimpangan dari daftar PANTAUSEMAR di atas untuk memulai deteksi kendaraan dan pengaturan
+                area ROI.</p>
+            <div id="quick-picks" class="quick-picks"></div>
+        </div>
+
+        <div id="camera-grid" class="camera-grid"></div>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>

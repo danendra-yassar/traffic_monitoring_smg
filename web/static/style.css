@@ -1,0 +1,425 @@
+/* web/static/style.css */
+
+:root {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-sub: #0b1220;
+  --border: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.16);
+  --success: #16a34a;
+  --success-bg: rgba(22, 163, 74, 0.16);
+  --warning: #eab308;
+  --warning-bg: rgba(234, 179, 8, 0.16);
+  --neutral: #64748b;
+  --neutral-bg: rgba(100, 116, 139, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-title h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.topbar-title p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pill {
+  background: var(--bg-sub);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+}
+
+.pill-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.pill strong {
+  font-size: 1.05rem;
+}
+
+.pill.pill-alert {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.control-bar {
+  padding: 1rem 1.5rem;
+  background: rgba(30, 41, 59, 0.55);
+  border-bottom: 1px solid var(--border);
+}
+
+.selector-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.selector-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.selector-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  gap: 0.5rem;
+  min-width: 280px;
+}
+
+.selector-inputs input {
+  flex: 1;
+  min-width: 240px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-sub);
+  color: var(--text-main);
+  font-size: 0.92rem;
+}
+
+.btn {
+  padding: 0.52rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn.hidden {
+  display: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-sub);
+  color: var(--text-main);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: #64748b;
+}
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.alert-banner {
+  margin: 1rem 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+}
+
+.alert-banner.hidden {
+  display: none;
+}
+
+.alert-banner.error {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: #fecaca;
+}
+
+.alert-banner.success {
+  background: var(--success-bg);
+  border-color: var(--success);
+  color: #bbf7d0;
+}
+
+.container {
+  padding: 1.5rem;
+}
+
+.empty-state {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.empty-state.hidden {
+  display: none;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin: 0.5rem auto 1.25rem;
+  max-width: 560px;
+}
+
+.quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.camera-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .camera-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.camera-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-card.high-queue {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg-sub);
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title-wrap h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stream-status {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Wadah video + overlay canvas ROI yang bertumpuk presisi */
+.video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+}
+
+.video-feed {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+}
+
+.roi-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.roi-canvas.editing {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.roi-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fde047;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  pointer-events: none;
+  text-align: center;
+}
+
+.roi-hint.hidden {
+  display: none;
+}
+
+/* Baris 1 setelah frame: Caption status volume kendaraan di posisi tengah (center) */
+.status-caption-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  background: rgba(11, 18, 32, 0.82);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+/* Baris 2 setelah caption: Tombol pengaturan ROI dengan posisi statis */
+.roi-controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 46px;
+  padding: 0.55rem 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  border-bottom: 1px solid var(--border);
+}
+
+.traffic-badge {
+  display: inline-block;
+  padding: 0.26rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--success-bg);
+  color: #86efac;
+  border: 1px solid var(--success);
+}
+
+.traffic-badge.neutral {
+  background: var(--neutral-bg);
+  color: #cbd5e1;
+  border-color: var(--neutral);
+}
+
+.traffic-badge.warning {
+  background: var(--warning-bg);
+  color: #fde047;
+  border-color: var(--warning);
+}
+
+.traffic-badge.danger {
+  background: var(--danger-bg);
+  color: #fca5a5;
+  border-color: var(--danger);
+}
+
+.metrics-body {
+  padding: 0.9rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.metric-box {
+  background: var(--bg-sub);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.metric-box span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.metric-box strong {
+  font-size: 1.05rem;
+}
+
+.class-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.class-chip {
+  background: var(--bg-sub);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+}
